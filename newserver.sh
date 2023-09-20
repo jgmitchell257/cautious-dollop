@@ -58,7 +58,7 @@ echo "[+] Done - user removed"
 
 echo "Cleaning up"
 echo "Removing new server script"
-rm config.sh
+rm newserver.sh
 echo "[+] Done"
 echo "Rebooting server now"
 shutdown -r now
