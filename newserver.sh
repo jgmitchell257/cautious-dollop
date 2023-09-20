@@ -39,7 +39,7 @@ read acctname
 adduser $acctname
 echo "[+] Done - user created"
 echo "Adding $acctname to sudo group"
-usermod -aG sudo $acctname
+/usr/sbin/usermod -aG sudo $acctname
 echo "[+] Done - user added to sudo"
 echo "Creating /home/$acctname/.ssh"
 mkdir /home/$acctname/.ssh
