@@ -4,17 +4,26 @@ echo "Checking to see if you are root..."
 echo ""
 
 # Quick check to see if user has root permissions
-if [ "$EUID" -ne 0 ]
+if [ "$EUID" -ne 0 ] 
 	then echo "You do not have the needed permissions to run this script."
 	exit
 fi
 
 echo "You are root!"
 echo ""
+echo "Press the enter key to continue..."
+read
 
+echo "Installing updates and essential tools"
 # Install OS updates and essential tools
 apt update && apt upgrade -y
-apt install net-tools ufw -y
+apt install net-tools sudo ufw -y
+
+
+echo "Enabling firewall on start"
+ufw enable
+echo "Configuring firewall to allow SSH traffic"
+ufw allow ssh
 
 # Typical server tasks
 echo "Enter a new server name"
@@ -22,24 +31,30 @@ read servername
 echo "Setting hostname to $servername"
 hostname $servername
 echo $servername > /etc/hostname
+echo "127.0.0.1		$servername" >> /etc/hosts
 echo "[+] Done - server name changed to $servername"
 
-ufw enable
-ufw allow ssh
-
 # Update SSH Keys
-echo "Deleting SSH keys"
-rm /etc/ssh/ssh_host_*
-echo "[+] Done - removed existing keys"
-dpkg-reconfigure openssh-server
+echo -n "Should the SSH keys be regenerated? [y/N]: "
+read -r regen
+if [[ $regen == y ]]
+	then
+		echo "Deleting SSH keys"
+		rm /etc/ssh/ssh_host_*
+		echo "[+] Done - removed existing keys"
+		dpkg-reconfigure openssh-server
+else
+	echo "Skipping SSH key regeneration"
+fi
 
 # Add new user account
-echo "Add a user account"
-read acctname
+echo "Creating a new user account"
+echo -n "Enter account username: "
+read -r acctname
 adduser $acctname
 echo "[+] Done - user created"
 echo "Adding $acctname to sudo group"
-/usr/sbin/usermod -aG sudo $acctname
+usermod -aG sudo $acctname
 echo "[+] Done - user added to sudo"
 echo "Creating /home/$acctname/.ssh"
 mkdir /home/$acctname/.ssh
