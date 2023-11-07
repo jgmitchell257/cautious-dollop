@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Usage: ./arcus-dns-collection.sh example.com [output.file]
+
 domain=$1
 output=$2
 
